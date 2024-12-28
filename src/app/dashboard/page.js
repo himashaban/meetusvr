@@ -1,27 +1,16 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
 import "./dashboard.css";
 
 export default function Dashboard() {
-  const [name, setName] = useState("");
-  const [id, setId] = useState("");
   const router = useRouter();
-
-  useEffect(() => {
-    // Fetching query params for name and id
-    const query = new URLSearchParams(window.location.search);
-    setName(query.get("name"));
-    setId(query.get("id"));
-  }, [setTimeout]);
+  const { name, id } = useSelector((state) => state.user);
 
   // Logout handler
   const handleLogout = () => {
-    // Optionally clear user-related data (e.g., localStorage, cookies)
-    // localStorage.clear(); // Uncomment this if you're using localStorage
-
-    // Redirect to the login page
+    // Optionally clear Redux state or cookies if needed
     router.push("/");
   };
 

@@ -1,10 +1,13 @@
 "use client";
+
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import "../login.css";
 import Image from "next/image";
 import passwordimg from "../images/password.png";
 import emailimg from "../images/sms.png";
+import { setUser } from "@/store/userSlice";
+import { useDispatch } from "react-redux";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -12,6 +15,7 @@ export default function Login() {
   const [emailError, setEmailError] = useState("");
   const [generalError, setGeneralError] = useState("");
   const router = useRouter();
+  const dispatch = useDispatch();
 
   const handleLogin = async () => {
     setEmailError("");
@@ -29,6 +33,7 @@ export default function Login() {
     }
 
     try {
+      // Directly calling the external API to login////////////////////////////////////////////////
       const loginResponse = await fetch(
         "https://api-yeshtery.dev.meetusvr.com/v1/yeshtery/token",
         {
@@ -44,8 +49,13 @@ export default function Login() {
         throw new Error("Invalid credentials");
       }
 
-      const { token } = await loginResponse.json();
+      const data = await loginResponse.json();
+      const token = data.token;
 
+      // Set token as an HTTP-only cookie (browser will handle this)///////////////////////////////
+      document.cookie = `token=${token}; HttpOnly; Secure; SameSite=Strict; Path=/; Max-Age=86400`;
+
+      // Fetch user info after login (use the token set in cookies)///////////////////////////////
       const userInfoResponse = await fetch(
         "https://api-yeshtery.dev.meetusvr.com/v1/user/info",
         {
@@ -63,17 +73,16 @@ export default function Login() {
 
       const { id, name } = await userInfoResponse.json();
 
-      ////////////////////////////////////// Redirect to the dashboard page ////////////////////////////////////////////////
-      router.push(
-        `/dashboard?name=${encodeURIComponent(name)}&id=${encodeURIComponent(
-          id
-        )}`
-      );
+      // Store user data in Redux (excluding token)///////////////////
+      dispatch(setUser({ id, name }));
+
+      // Redirect to the dashboard/////////////////////////////
+      router.push("/dashboard");
     } catch (err) {
       setGeneralError(err.message || "Something went wrong");
     }
   };
-
+//retrun////////////////////////////////
   return (
     <main className="login-container">
       <div
@@ -106,7 +115,6 @@ export default function Login() {
               alt="icon"
               className="input-icon"
             />
-
             <input
               type="email"
               placeholder="Email"
@@ -134,7 +142,6 @@ export default function Login() {
               onChange={(e) => setPassword(e.target.value)}
             />
           </div>
-          {/*///////////////////////////////////////////////////////////////general erorr //////////////////////////////////////////////////////////*/}
           {generalError && (
             <p style={{ color: "red", margin: "0" }}>{generalError}</p>
           )}
