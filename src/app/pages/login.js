@@ -86,7 +86,7 @@ export default function Login() {
   return (
     <main className="login-container">
       <div
-        className="mainLogin"
+        className="mainLogin mx-auto flex justify-center items-center p-5 sm:max-w-sm md:max-w-md lg:max-w-lg"
         style={{
           padding: "20px",
           maxWidth: "470px",

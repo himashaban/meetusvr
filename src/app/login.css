@@ -69,6 +69,16 @@ label {
     text-align: center;
     transform: translate(-130px, 50px);
 }
+@media (max-width: 768px) {
+  .mainLogin {
+    transform: translate(33%); /* Disable translate on smaller screens */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh; /* Ensure content is vertically centered */
+    margin: 0; /* Reset margin to avoid any misalignment */
+  }
+}
 /* Login */
 
 
